@@ -1,30 +1,30 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   CloudMoon,
   CloudSun,
-  GithubLogo,
-  LinkedinLogo,
-  ThreadsLogo,
-  XLogo,
 } from "@phosphor-icons/react";
 import { Link } from "react-router-dom";
 
 export default function Header({ type }) {
+  const [theme, setTheme] = useState("dark");
+
+  // Load mode dari localStorage saat pertama kali
   useEffect(() => {
     const html = document.documentElement;
-    const savedMode = localStorage.getItem("theme") || "dark";
-    if (savedMode === "dark") html.classList.add("dark");
-    else html.classList.remove("dark");
+    const saved = localStorage.getItem("theme") || "dark";
+    setTheme(saved);
+    html.classList.toggle("dark", saved === "dark");
   }, []);
 
+  // Fungsi toggle
   const toggleMode = () => {
-    const html = document.documentElement;
-    const isDark = html.classList.contains("dark");
-    const newMode = isDark ? "light" : "dark";
-    html.classList.toggle("dark");
-    localStorage.setItem("theme", newMode);
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    localStorage.setItem("theme", newTheme);
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
   };
 
+  // Jika di halaman work
   if (type === "work") {
     return (
       <header className="w-full max-w-4xl mx-auto px-6 py-6 md:py-12 grid grid-cols-[auto_1fr_auto] items-center gap-4">
@@ -39,13 +39,13 @@ export default function Header({ type }) {
           <span className="absolute left-0 bottom-0 w-full h-[2px] bg-black/30 dark:bg-white/30 group-hover:bg-black dark:group-hover:bg-white transition-all duration-300 origin-left" />
         </a>
 
-        {/* Dark mode toggle */}
+        {/* Toggle Mode */}
         <button
           title="Toggle Mode"
           onClick={toggleMode}
           className="justify-self-center text-2xl transition-all duration-300"
         >
-          <CloudMoon />
+          {theme === "dark" ? <CloudMoon /> : <CloudSun />}
         </button>
 
         {/* Judul */}
@@ -56,7 +56,7 @@ export default function Header({ type }) {
     );
   }
 
-  // Default (Halaman Utama)
+  // Jika di halaman utama
   return (
     <header className="flex items-center justify-between gap-4 px-6 py-6 md:py-12 max-w-4xl mx-auto">
       {/* Nama */}
@@ -71,10 +71,10 @@ export default function Header({ type }) {
         onClick={toggleMode}
         className="text-2xl transition-all duration-300"
       >
-        <CloudMoon />
+        {theme === "dark" ? <CloudMoon /> : <CloudSun />}
       </button>
 
-      {/* Link ke WORK */}
+      {/* → WORK */}
       <Link
         to="/work"
         className="group font-bold text-sm md:text-base relative inline-block opacity-0 animate-fadeIn delay-[400ms] transition duration-300"
